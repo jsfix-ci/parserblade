@@ -1,6 +1,6 @@
 const Base = require('./Base')
 const ParserError = require('../errors/ParserError')
-const csvParser = require('csv-parse/lib/sync')
+const csvParser = require('csv-parse/sync')
 const csvStringify = require('csv-stringify/lib/sync')
 const csvParserStream = require('csv-parse')
 const csvStringifyStream = require('csv-stringify')
@@ -42,7 +42,7 @@ Csv.prototype.parse = function parse (data, options = {}) {
   }
 
   try {
-    return csvParser(data, config)
+    return csvParser.parse(data, config)
   } catch (e) {
     const context = {
       code: e.code,
@@ -98,7 +98,11 @@ Csv.prototype.pipeParse = function pipeParse (options = {}) {
     columns: Reflect.has(options, 'headers') ? options.headers : true
   }
 
-  return csvParserStream(config)
+  return (
+    /* TODO: JSFIX could not patch the breaking change:
+    Rename option relax to relax_quotes */
+    csvParserStream.parse(config)
+  )
 }
 
 /**
